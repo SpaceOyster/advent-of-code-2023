@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       Day.One
+      Day.Two
       Main
   other-modules:
       Paths_advent_of_code
@@ -44,6 +45,7 @@ executable advent-of-code-exe
   main-is: Main.hs
   other-modules:
       Day.One
+      Day.Two
       Paths_advent_of_code
   autogen-modules:
       Paths_advent_of_code
