@@ -41,9 +41,6 @@ isGamePossible game setOfCubes = all (< setOfCubes) $ gSequence game
 findPossible :: [Game] -> SetOfCubes -> [Game]
 findPossible game setOfCubes = [g | g <- game, g `isGamePossible` setOfCubes]
 
-findImpossible :: [Game] -> SetOfCubes -> [Game]
-findImpossible game setOfCubes = [g | g <- game, not (g `isGamePossible` setOfCubes)]
-
 -- it's tempting to use parsec here
 parseGames :: T.Text -> [Game]
 parseGames text = do
