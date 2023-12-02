@@ -7,7 +7,13 @@ import qualified Data.Text as T
 import qualified Data.Text.IO as T
 
 newtype CubesNumber = CubesNumber {getCubesNumber :: Integer}
-  deriving (Num, Eq, Ord, Enum, Show, Real, Integral)
+  deriving (Num, Eq, Ord, Enum, Show, Real)
+
+instance Integral CubesNumber where
+  toInteger = getCubesNumber
+  quotRem a b =
+    let (x, y) = quotRem (getCubesNumber a) (getCubesNumber b)
+     in (CubesNumber x, CubesNumber y)
 
 data SetOfCubes = SetOfCubes
   { socRed :: CubesNumber,
