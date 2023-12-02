@@ -84,8 +84,8 @@ solution1 file = do
   contents <- T.readFile file
   let games = parseGames contents
       setOfCubes = SetOfCubes {socRed = 12, socGreen = 13, socBlue = 14}
-  print $ sum (gNumber <$> findPossible games setOfCubes)
-
+      answer = sum (gNumber <$> findPossible games setOfCubes)
+  print answer
 
 minimalSetFor :: Game -> SetOfCubes
 minimalSetFor g = foldr merge (SetOfCubes 0 0 0) $ gSequence g
