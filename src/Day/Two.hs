@@ -83,6 +83,25 @@ solution1 file = do
       setOfCubes = SetOfCubes {socRed = 12, socGreen = 13, socBlue = 14}
   print $ sum (gNumber <$> findPossible games setOfCubes)
 
+
+minimalSetFor :: Game -> SetOfCubes
+minimalSetFor g = foldr merge (SetOfCubes 0 0 0) $ gSequence g
+  where
+    merge a b =
+      SetOfCubes
+        { socRed = socRed a `max` socRed b,
+          socGreen = socGreen a `max` socGreen b,
+          socBlue = socBlue a `max` socBlue b
+        }
+
+powerOfSet :: SetOfCubes -> Integer
+powerOfSet s = fromIntegral $ socRed s * socGreen s * socBlue s
+
+solution2 :: FilePath -> IO ()
 solution2 file = do
   contents <- T.readFile file
-  print "not implemented yet"
+  let games = parseGames contents
+      minimalSets = minimalSetFor <$> games
+      powers = powerOfSet <$> minimalSets
+      answer = sum powers
+  print answer

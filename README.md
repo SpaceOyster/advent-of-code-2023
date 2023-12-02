@@ -10,7 +10,7 @@ Also inputs in `/inputs` dir are unique for each user, if I understood #aoc
 correctly. These are inputs I got.
 
 - [X] Day One
-- [ ] Day Two
+- [X] Day Two
 - [ ] Day Three
 - [ ] Day Four
 - [ ] Day Five
