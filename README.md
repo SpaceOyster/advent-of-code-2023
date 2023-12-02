@@ -1,8 +1,13 @@
-# advent-of-code
+# [Advent Of Code 2023](https://adventofcode.com/2023)
+It's the most wonderfull time of the year 2023 :)
+
 I post my solutions almost as is, without making it super optimal, just doing a
 little cleanup to remove irrelevant clutter and make it more readable.
 
 And, yeah, it's in Haskell.
+
+Also inputs in `/inputs` dir are unique for each user, if I understood #aoc
+correctly. These are inputs I got.
 
 - [X] Day One
 - [ ] Day Two
