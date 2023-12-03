@@ -179,6 +179,8 @@ parseSymbol line =
   let x = T.head line
    in if x /= '.' && not (C.isDigit x) then Just $ Symbol x else Nothing
 
+-- Set is an unordered container, that holds only unique values. It's used here
+-- to automatically iliminate duplicates. Could use a List with `nub` in the end
 coordinatesToCheck :: Coordinates -> PartNumber -> Set.Set Coordinates
 coordinatesToCheck c p = coords
   where
