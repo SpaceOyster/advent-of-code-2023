@@ -10,6 +10,7 @@ import Data.Maybe (fromMaybe)
 import qualified Data.Set as Set
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
+import Text.Printf (IsChar)
 
 data Coordinates = Coordinates {cX :: Int, cY :: Int}
   deriving (Show, Eq, Ord)
@@ -23,12 +24,13 @@ incX x c = c {cX = cX c + x}
 incY :: Int -> Coordinates -> Coordinates
 incY y c = c {cY = cY c + y}
 
-data Symbol = Symbol deriving (Show)
+newtype Symbol = Symbol {getSymbol :: Char}
+  deriving (Show, Eq, Ord, IsChar)
 
 newtype PartNumber = PartNumber
   { pnNumber :: Integer
   }
-  deriving (Show, Eq, Ord, Num, Enum, Real, Integral)
+  deriving (Show, Eq, Ord, Num, Enum, Real)
 
 pnLength :: PartNumber -> Int
 pnLength = length . show . pnNumber
@@ -87,9 +89,6 @@ stepYForward = stepYForwardBy 1
 goToBegingOfLine :: NoteParser ()
 goToBegingOfLine = modify $ modifyCoordinates nullifyX
 
-nextLine :: NoteParser ()
-nextLine = stepYForward >> goToBegingOfLine
-
 addSymbolToState :: Symbol -> NoteParser ()
 addSymbolToState s = do
   cs <- gets psCoordinates
@@ -131,7 +130,7 @@ parseNumber line = case T.takeWhile C.isDigit line of
 parseSymbol :: T.Text -> Maybe Symbol
 parseSymbol line =
   let x = T.head line
-   in if x /= '.' && not (C.isDigit x) then Just Symbol else Nothing
+   in if x /= '.' && not (C.isDigit x) then Just $ Symbol x else Nothing
 
 coordinatesToCheck :: Coordinates -> PartNumber -> Set.Set Coordinates
 coordinatesToCheck c p = coords
@@ -156,7 +155,26 @@ solution1 file = do
   contents <- T.readFile file
   print $ sum $ findValidNumbers $ parseNote contents
 
+newtype Gear = Gear {gCoordinates :: Coordinates}
+  deriving (Show)
+
+findGears :: Note -> [Gear]
+findGears n = Gear <$> (Map.keys $ Map.filter (== Symbol '*') $ nSymbols n)
+
+isNumberAdjacentTo :: PartNumber -> Coordinates -> Gear -> Bool
+isNumberAdjacentTo p pnC g = Set.member (gCoordinates g) $ coordinatesToCheck pnC p
+
+findGearAdjacentNumbers :: Note -> Gear -> [PartNumber]
+findGearAdjacentNumbers n g = Map.elems $ Map.filterWithKey f $ nNumbers n
+  where
+    gY = cY $ gCoordinates g
+    f c p = cY c `elem` [gY - 1, gY, gY + 1] && isNumberAdjacentTo p c g
+
 solution2 :: FilePath -> IO ()
 solution2 file = do
   contents <- T.readFile file
-  print "unimplemented yet"
+  let note = parseNote contents
+      gearNumbers = findGearAdjacentNumbers note <$> findGears note
+      onlyPairs = filter (\x -> length x == 2) gearNumbers
+      gearRatios = foldr (\a b -> b * pnNumber a) 1 <$> onlyPairs
+  print $ sum gearRatios
