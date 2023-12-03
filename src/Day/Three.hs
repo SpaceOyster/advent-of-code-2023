@@ -156,14 +156,14 @@ parseLine :: T.Text -> NoteParser ()
 parseLine line = do
   x <- St.gets (cX . psCoordinates) -- gets current position in line
   case T.findIndex (/= '.') $ T.drop x line of -- gets token index relatively to x
-    Just i -> stepXForwardBy i >> parseOnCurrentPosition line >> parseLine line
+    Just i -> stepXForwardBy i >> parseToken line >> parseLine line
     Nothing -> pure ()
 
-parseOnCurrentPosition :: T.Text -> NoteParser ()
-parseOnCurrentPosition line' = do
+parseToken :: T.Text -> NoteParser ()
+parseToken line' = do
   x <- St.gets (cX . psCoordinates) -- gets current position in line
   let line = T.drop x line' -- skips to current position
-  fromMaybe stepXForward $
+  fromMaybe stepXForward $ -- run the one that succedes or just stepXForward
     asum
       [ (\s -> addSymbolToState s >> stepXForward) <$> parseSymbol line,
         (\n -> addNumberToState n >> stepXForwardBy (pnLength n)) <$> parseNumber line
