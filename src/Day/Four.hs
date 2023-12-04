@@ -62,7 +62,27 @@ solution1 file = do
       scores = countCardScore <$> cards
   print $ sum scores
 
+generateWonCards :: [Card] -> Card -> [Card]
+generateWonCards orig c =
+  let n = countWinningNumbersGot c
+   in take n $
+        drop (getCardNumber $ cNumber c) orig
+
+processCards :: [Card] -> [Card]
+processCards orig = do
+  mconcat $ go ((: []) <$> orig)
+  where
+    go [] = []
+    go ([] : css) = go css
+    go (cs : css) =
+      let c = head cs
+          l = length cs
+          wCs = replicate l <$> generateWonCards orig c
+       in cs : go (zipWith (<>) css (wCs <> repeat []))
+
 solution2 :: FilePath -> IO ()
 solution2 file = do
   contents <- T.readFile file
-  print "unimplemented"
+  let cards = fromMaybe [] $ parseCards contents
+      cardsWithWonCards = processCards cards
+  print $ length cardsWithWonCards
