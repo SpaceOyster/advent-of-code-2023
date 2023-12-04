@@ -99,18 +99,15 @@ parseCards = traverse parseCard . T.lines
 
 parseCard :: T.Text -> Maybe Card
 parseCard line =
-  case T.splitOn ": " line of
-    [cn, ns] -> go cn ns
+  case T.splitOn " | " =<< T.splitOn ": " line of
+    [cn, winNs, nsGot] -> doParse cn winNs nsGot
     _ -> Nothing
   where
-    go cn ns =
-      case T.splitOn " | " ns of
-        [winNs, nsGot] ->
-          Card
-            <$> parseCardNumber cn
-            <*> Just (parseCardNumbers winNs)
-            <*> Just (parseCardNumbers nsGot)
-        _ -> Nothing
+    doParse cn winNs nsGot =
+      Card
+        <$> parseCardNumber cn
+        <*> Just (parseCardNumbers winNs)
+        <*> Just (parseCardNumbers nsGot)
 
 parseCardNumber :: T.Text -> Maybe CardNumber
 parseCardNumber t = do
@@ -184,13 +181,13 @@ scratchcards do you end up with?
 generateWonCards :: [Card] -> Card -> [Card]
 generateWonCards orig c =
   let n = countWinningNumbersGot c
-   in take n $
-        drop (getCardNumber $ cNumber c) orig
+   in take n $ drop (getCardNumber $ cNumber c) orig
 
 processCards :: [Card] -> [Card]
 processCards orig = do
   mconcat $ go ((: []) <$> orig)
   where
+    go :: [[Card]] -> [[Card]]
     go [] = []
     go ([] : css) = go css
     go (cs : css) =
