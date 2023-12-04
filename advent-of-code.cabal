@@ -25,6 +25,7 @@ source-repository head
 
 library
   exposed-modules:
+      Day.Four
       Day.One
       Day.Three
       Day.Two
@@ -47,6 +48,7 @@ library
 executable advent-of-code-exe
   main-is: Main.hs
   other-modules:
+      Day.Four
       Day.One
       Day.Three
       Day.Two
