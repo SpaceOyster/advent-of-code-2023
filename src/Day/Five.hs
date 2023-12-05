@@ -338,5 +338,4 @@ solution2 file = do
   contents <- T.readFile file
   let almanac = fromMaybe emptyAlmanac $ parseAlmanac contents
       locationRanges = followAlmanac2 almanac
-  print almanac
   print $ minInRanges locationRanges
