@@ -13,7 +13,7 @@ correctly. These are inputs I got.
 - [X] Day Two
 - [X] Day Three
 - [X] Day Four
-- [ ] Day Five
+- [X] Day Five
 - [ ] Day Six
 - [ ] Day Seven
 - [ ] Day Eight
