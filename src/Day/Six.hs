@@ -32,12 +32,15 @@ parseRaceTable text = case T.words <$> T.lines text of
   where
     f = fmap (read . T.unpack) . tail
 
+-- difference betwwen actual time and expected time
 calcDistanceDelta :: TimeF -> RaceTableEntry -> DistanceF
 calcDistanceDelta t rte = t * (fromIntegral (raceTime rte) - t) - fromIntegral (raceDistance rte)
 
+-- product function
 calcDistanceDeltaProdF :: TimeF -> RaceTableEntry -> DistanceF
 calcDistanceDeltaProdF t rte = fromIntegral (raceTime rte) - (2 * t)
 
+-- find zero of product function touching main func on spot t
 closestProdZero :: TimeF -> RaceTableEntry -> TimeF
 closestProdZero t rte =
   let prod = calcDistanceDeltaProdF t rte
@@ -45,8 +48,9 @@ closestProdZero t rte =
    in t - curDist / prod
 
 sigma :: Float
-sigma = 0.01
+sigma = 0.1
 
+-- searching for zero with Newton method
 searchForZero :: TimeF -> RaceTableEntry -> TimeF
 searchForZero t rte
   | abs delta < sigma = t
@@ -61,7 +65,8 @@ findWinningTimeRange :: RaceTableEntry -> WinningTimeRange
 findWinningTimeRange rte =
   let rteTarget = rte {raceDistance = raceDistance rte + 1}
       lowestWinningTime = ceiling $ searchForZero 0 rteTarget
-      highestWinningTime = floor $ searchForZero (fromIntegral $ raceTime rte) rteTarget
+      -- highestWinningTime = floor $ searchForZero (fromIntegral $ raceTime rte) rteTarget
+      highestWinningTime = raceTime rte - lowestWinningTime -- this optimisation is possible because distance function is symetrical over center of [0, raceTime]
    in WinningTimeRange {lowestWinningTime, highestWinningTime}
 
 countWinningTimes :: WinningTimeRange -> Int
@@ -76,7 +81,18 @@ solution1 file = do
   print countWTimes
   print $ product $ countWinningTimes <$> winningRanges
 
+parseRaceTable2 :: T.Text -> RaceTable
+parseRaceTable2 text = case T.words <$> T.lines text of
+  [ts, ds] -> RaceTable $ pure $ RaceTableEntry (f ts) (f ds)
+  _ -> RaceTable []
+  where
+    f = read . T.unpack . mconcat . tail
+
 solution2 :: FilePath -> IO ()
 solution2 file = do
   contents <- T.readFile file
-  print "unimplemented"
+  let raceTable = parseRaceTable2 contents
+      winningRanges = findWinningTimeRange <$> raceTableEntries raceTable
+      countWTimes = countWinningTimes <$> winningRanges
+  print winningRanges
+  print countWTimes
