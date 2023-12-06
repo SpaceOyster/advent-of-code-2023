@@ -128,7 +128,7 @@ calcDistanceDelta t rte = t * (fromIntegral (raceTime rte) - t) - fromIntegral (
 calcDistanceDeltaProdF :: TimeF -> RaceTableEntry -> DistanceF
 calcDistanceDeltaProdF t rte = fromIntegral (raceTime rte) - (2 * t)
 
--- find zero of product function touching main func on spot t
+-- find zero of tanget line function, touching main func on spot t
 closestProdZero :: TimeF -> RaceTableEntry -> TimeF
 closestProdZero t rte =
   let prod = calcDistanceDeltaProdF t rte
