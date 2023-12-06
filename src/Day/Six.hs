@@ -124,16 +124,16 @@ parseRaceTable text = case T.words <$> T.lines text of
 calcDistanceDelta :: TimeF -> RaceTableEntry -> DistanceF
 calcDistanceDelta t rte = t * (fromIntegral (raceTime rte) - t) - fromIntegral (raceDistance rte)
 
--- product function
-calcDistanceDeltaProdF :: TimeF -> RaceTableEntry -> DistanceF
-calcDistanceDeltaProdF t rte = fromIntegral (raceTime rte) - (2 * t)
+-- derivative function
+calcDistanceDeltaDerivativeF :: TimeF -> RaceTableEntry -> DistanceF
+calcDistanceDeltaDerivativeF t rte = fromIntegral (raceTime rte) - (2 * t)
 
 -- find zero of tanget line function, touching main func on spot t
-closestProdZero :: TimeF -> RaceTableEntry -> TimeF
-closestProdZero t rte =
-  let prod = calcDistanceDeltaProdF t rte
+closestDerivativeZero :: TimeF -> RaceTableEntry -> TimeF
+closestDerivativeZero t rte =
+  let derivative = calcDistanceDeltaDerivativeF t rte
       curDist = calcDistanceDelta t rte
-   in t - curDist / prod
+   in t - curDist / derivative
 
 sigma :: Float
 sigma = 0.1
@@ -142,7 +142,7 @@ sigma = 0.1
 searchForZero :: TimeF -> RaceTableEntry -> TimeF
 searchForZero t rte
   | abs delta < sigma = t
-  | otherwise = searchForZero (closestProdZero t rte) rte
+  | otherwise = searchForZero (closestDerivativeZero t rte) rte
   where
     delta = calcDistanceDelta t rte
 
