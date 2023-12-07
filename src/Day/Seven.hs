@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Day.Seven (solution1, solution2) where
 
@@ -39,10 +39,10 @@ instance Enum Card where
 instance Ord Card where
   compare a b = compare (fromEnum a) (fromEnum b)
 
-newtype Hand = Hand {hCards :: [Card]}
+newtype Hand c = Hand {hCards :: [c]}
   deriving (Show, Eq)
 
-instance Ord Hand where
+instance Ord (Hand Card) where
   compare (Hand a) (Hand b) =
     compare (findCombination a) (findCombination b) <> compare a b
 
@@ -72,15 +72,18 @@ findCombination cs =
 
 type Bid = Int
 
-data Competitor = Competitor
-  { cHand :: Hand,
+data Competitor c = Competitor
+  { cHand :: Hand c,
     cBid :: Bid
   }
-  deriving (Show, Eq, Ord)
+  deriving (Show, Eq)
 
-type Game = [Competitor]
+instance (Eq c, Ord (Hand c)) => Ord (Competitor c) where
+  compare a b = compare (cHand a) (cHand b)
 
-totalWinnings :: Game -> Integer
+type Game = [Competitor Card]
+
+totalWinnings :: (Eq c, Ord (Hand c)) => [Competitor c] -> Integer
 totalWinnings game =
   let sortedGame = sort game
    in sum $ zipWith (\g n -> fromIntegral (cBid g * n)) sortedGame [1 ..]
@@ -94,7 +97,53 @@ solution1 file = do
   let game = parseGame contents
   print $ totalWinnings game
 
+newtype CardWJoker = CardWJoker {getJCard :: Char}
+  deriving (Eq)
+
+instance Show CardWJoker where
+  show = show . getJCard
+
+instance Enum CardWJoker where
+  fromEnum a = case getJCard a of
+    'J' -> 1
+    x -> fromEnum $ Card x
+  toEnum i = CardWJoker $ case i of
+    1 -> 'J'
+    x -> getCard $ toEnum x
+
+instance Ord CardWJoker where
+  compare a b = compare (fromEnum a) (fromEnum b)
+
+instance Ord (Hand CardWJoker) where
+  compare (Hand a) (Hand b) =
+    compare (findCombinationJ a) (findCombinationJ b) <> compare a b
+
+upgradeCombinationBy :: Combination -> Int -> Combination
+upgradeCombinationBy c 0 = c
+upgradeCombinationBy c 1 = case c of
+  HighCard -> OnePair
+  OnePair -> Three
+  TwoPair -> FullHouse
+  Three -> Four
+  FullHouse -> FullHouse
+  Four -> Five
+  Five -> Five
+upgradeCombinationBy c n = upgradeCombinationBy (upgradeCombinationBy c 1) (n - 1)
+
+findCombinationJ :: [CardWJoker] -> Combination
+findCombinationJ cs =
+  let js = length (filter (== CardWJoker 'J') cs)
+      withoutJs = (Card . getJCard <$> filter (/= CardWJoker 'J') cs)
+      combWithoutJs = findCombination withoutJs
+   in if js == 5 then Five else upgradeCombinationBy combWithoutJs js
+
+type GameWithJokers = [Competitor CardWJoker]
+
+parseGameJ :: T.Text -> GameWithJokers
+parseGameJ = fmap ((\[h, b] -> Competitor (Hand (CardWJoker <$> T.unpack h)) (read $ T.unpack b)) . T.words) . T.lines
+
 solution2 :: FilePath -> IO ()
 solution2 file = do
   contents <- T.readFile file
-  print "unimplemented"
+  let game = parseGameJ contents
+  print $ totalWinnings game
