@@ -16,7 +16,7 @@ correctly. These are inputs I got.
 - [X] Day Five
 - [X] Day Six
 - [X] Day Seven
-- [ ] Day Eight
+- [X] Day Eight
 - [ ] Day Nine
 - [ ] Day Ten
 - [ ] Day Eleven
