@@ -53,18 +53,18 @@ followInstruction m n i =
     L -> Map.lookup (nLeft n) m
     R -> Map.lookup (nRight n) m
 
-findZZZ :: Map.Map T.Text Node -> [Instruction] -> Maybe Int
-findZZZ m is = do
-  n <- Map.lookup "AAA" m
-  go n (cycle is) 0
+findZZZ :: Map.Map T.Text Node -> [Instruction] -> Node -> Maybe Int
+findZZZ m is startNode = go startNode (cycle is) 0
   where
     go :: Node -> [Instruction] -> Int -> Maybe Int
-    go n is' s = case nName n of
-      "ZZZ" -> pure s
-      _ -> followInstruction m n (head is') >>= \n' -> go n' (drop 1 is') (s + 1)
+    go n is' s
+      | T.last (nName n) == 'Z' = pure s
+      | otherwise = followInstruction m n (head is') >>= \n' -> go n' (drop 1 is') (s + 1)
 
 searchZZZ :: List -> Maybe Int
-searchZZZ l = findZZZ (lMap l) (lInstructions l)
+searchZZZ l = do
+  start <- Map.lookup "AAA" (lMap l)
+  findZZZ (lMap l) (lInstructions l) start
 
 solution1 :: FilePath -> IO ()
 solution1 file = do
@@ -72,7 +72,23 @@ solution1 file = do
   let listM = parseList contents
   print $ listM >>= searchZZZ
 
+pickStartingNodes :: List -> [Node]
+pickStartingNodes l = fmap snd . Map.toList $ Map.filter f (lMap l)
+  where
+    f n = T.last (nName n) == 'A'
+
+findLeastCommonMultiple :: [Int] -> Int
+findLeastCommonMultiple = foldr lcm 1
+
+findEndZ :: List -> Maybe Int
+findEndZ l = do
+  finishSteps <- traverse (findZZZ (lMap l) (lInstructions l)) startingNodes
+  pure $ findLeastCommonMultiple finishSteps
+  where
+    startingNodes = pickStartingNodes l
+
 solution2 :: FilePath -> IO ()
 solution2 file = do
   contents <- T.readFile file
-  print "unimplemented"
+  let listM = parseList contents
+  print $ listM >>= findEndZ
