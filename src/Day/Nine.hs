@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Day.Nine (solution1, solution2) where
 
 import qualified Data.Text as T
@@ -27,3 +25,15 @@ solution1 file = do
   let sequences = parseSequences contents
       nextNumbers = findNextNumber <$> sequences
   print $ sum nextNumbers
+
+findPreviousNumber :: Sequence -> Int
+findPreviousNumber s = foldr f 0 $ findAllRows s
+  where
+    f l p = head l - p
+
+solution2 :: FilePath -> IO ()
+solution2 file = do
+  contents <- T.readFile file
+  let sequences = parseSequences contents
+      previousNumbers = findPreviousNumber <$> sequences
+  print $ sum previousNumbers
