@@ -28,6 +28,7 @@ library
       Day.Eight
       Day.Five
       Day.Four
+      Day.Nine
       Day.One
       Day.Seven
       Day.Six
@@ -55,6 +56,7 @@ executable advent-of-code-exe
       Day.Eight
       Day.Five
       Day.Four
+      Day.Nine
       Day.One
       Day.Seven
       Day.Six

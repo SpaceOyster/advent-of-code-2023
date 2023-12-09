@@ -3,6 +3,7 @@ module Main (main) where
 import qualified Day.Eight
 import qualified Day.Five
 import qualified Day.Four
+import qualified Day.Nine
 import qualified Day.One
 import qualified Day.Seven
 import qualified Day.Six
@@ -27,7 +28,9 @@ main = do
     "6.1" -> Day.Six.solution1 inputFile
     "6.2" -> Day.Six.solution2 inputFile
     "7.1" -> Day.Seven.solution1 inputFile
-    "7.1" -> Day.Seven.solution2 inputFile
-    "8.2" -> Day.Eight.solution1 inputFile
+    "7.2" -> Day.Seven.solution2 inputFile
+    "8.1" -> Day.Eight.solution1 inputFile
     "8.2" -> Day.Eight.solution2 inputFile
+    "9.1" -> Day.Nine.solution1 inputFile
+    "9.2" -> Day.Nine.solution2 inputFile
     _ -> print $ "no solution with index " <> show day
