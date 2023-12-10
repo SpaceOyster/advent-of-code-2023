@@ -7,6 +7,7 @@ import qualified Day.Nine
 import qualified Day.One
 import qualified Day.Seven
 import qualified Day.Six
+import qualified Day.Ten
 import qualified Day.Three
 import qualified Day.Two
 import qualified System.Environment as E
@@ -33,4 +34,6 @@ main = do
     "8.2" -> Day.Eight.solution2 inputFile
     "9.1" -> Day.Nine.solution1 inputFile
     "9.2" -> Day.Nine.solution2 inputFile
+    "10.1" -> Day.Ten.solution1 inputFile
+    "10.2" -> Day.Ten.solution2 inputFile
     _ -> print $ "no solution with index " <> show day

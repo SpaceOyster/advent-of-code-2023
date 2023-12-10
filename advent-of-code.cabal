@@ -32,6 +32,7 @@ library
       Day.One
       Day.Seven
       Day.Six
+      Day.Ten
       Day.Three
       Day.Two
       Main
@@ -60,6 +61,7 @@ executable advent-of-code-exe
       Day.One
       Day.Seven
       Day.Six
+      Day.Ten
       Day.Three
       Day.Two
       Paths_advent_of_code
