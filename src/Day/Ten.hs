@@ -2,41 +2,51 @@
 
 module Day.Ten (solution1, solution2) where
 
-import Data.List (elemIndex, findIndex, groupBy, nub, sortBy)
+import Data.List (find)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
+import GHC.Arr as Arr
 
-newtype Pipe = Pipe {tPipe :: Char}
-  deriving (Show, Eq, Ord, Enum)
+newtype Pipe = Pipe {unPipe :: Char}
+  deriving (Eq, Ord, Enum)
+
+instance Show Pipe where
+  show = show . unPipe
 
 data Direction = North | West | South | East
   deriving (Show, Eq, Ord, Bounded, Enum)
 
 type Point = (Int, Int)
 
-type Bounds = (Point, Point)
-
 type Start = Point
 
 type Path = [Point]
 
-type Field = [String]
+type PipeMap = Arr.Array Point Pipe
 
 allDirections :: [Direction]
 allDirections = [minBound .. maxBound]
 
-toField :: T.Text -> Field
-toField = fmap T.unpack . T.lines
+parsePipeMap :: T.Text -> PipeMap
+parsePipeMap text =
+  let ls = T.unpack <$> T.lines text
+      xbound = length $ head ls
+      ybound = length ls
+      indexedChars = zipWith (\l y -> zipWith (\c x -> ((x, y), Pipe c)) l [1 .. xbound]) ls [1 .. ybound]
+   in Arr.array ((1, 1), (xbound, ybound)) $ mconcat indexedChars
 
-findStart :: Field -> Maybe (Int, Int)
-findStart field = do
-  y <- findIndex (elem 'S') field
-  x <- elemIndex 'S' (field !! y)
-  return (x, y)
+findStart :: PipeMap -> Maybe Point
+findStart pm =
+  let inds = Arr.indices pm
+   in find (\i -> unPipe (pm ! i) == 'S') inds
 
-inBounds :: Point -> Bounds -> Bool
-inBounds (x, y) ((minX, minY), (maxX, maxY)) =
-  and [x >= minX, x < maxX, y >= minY, y < maxY]
+isPipe :: Char -> Bool
+isPipe = (`elem` ("S|-LJ7F" :: [Char]))
+
+inBounds :: Point -> PipeMap -> Bool
+inBounds (x, y) pm =
+  let ((minX, minY), (maxX, maxY)) = Arr.bounds pm
+   in and [x >= minX, x < maxX, y >= minY, y < maxY]
 
 stepDirection :: Point -> Direction -> Point
 stepDirection (x, y) d =
@@ -46,8 +56,8 @@ stepDirection (x, y) d =
     South -> (x, y + 1)
     East -> (x + 1, y)
 
-charAtPoint :: Field -> Point -> Char
-charAtPoint field (x, y) = field !! y !! x
+charAtPoint :: PipeMap -> Point -> Char
+charAtPoint pm p = unPipe $ pm ! p
 
 availableDirectionsFor :: Char -> [Direction]
 availableDirectionsFor c =
@@ -61,29 +71,29 @@ availableDirectionsFor c =
     'F' -> [South, East]
     _ -> []
 
-findAvailableSteps :: Field -> Bounds -> Point -> [Point]
-findAvailableSteps field b p
-  | not (inBounds p b) = []
-  | otherwise = filter f $ stepDirection p <$> availableDirectionsFor (charAtPoint field p)
+findAvailableSteps :: PipeMap -> Point -> [Point]
+findAvailableSteps pm p
+  | not (inBounds p pm) = []
+  | otherwise = filter f $ stepDirection p <$> availableDirectionsFor (charAtPoint pm p)
   where
-    f p' = inBounds p' b && (charAtPoint field p' `elem` ("S|-LJ7F" :: [Char]))
+    f p' = inBounds p' pm && isPipe (charAtPoint pm p')
 
-followLoop :: Field -> Start -> Path
-followLoop field start = reverse $ go start [start]
+followLoop :: PipeMap -> Start -> Path
+followLoop pm start = reverse $ go start [start]
   where
-    bounds = ((0, 0), (length $ head field, length field))
     go :: Point -> Path -> Path
-    go p path = case filter (not . (`elem` path)) (findAvailableSteps field bounds p) of
-      x : _ -> if x == start then path else go x (x : path)
+    go p path = case filter (not . (`elem` path)) (findAvailableSteps pm p) of
+      x : _ -> if x == start then start : path else go x (x : path)
       [] -> path
 
 solution1 :: FilePath -> IO ()
 solution1 file = do
   contents <- T.readFile file
-  let field = toField contents
-      startM = findStart field
-      loopM = followLoop field <$> startM
+  let pm = parsePipeMap contents
+      startM = findStart pm
+      loopM = followLoop pm <$> startM
       farthestStepsM = fmap ((`div` 2) . length) loopM
+  print startM
   print farthestStepsM
 
 solution2 :: FilePath -> IO ()
