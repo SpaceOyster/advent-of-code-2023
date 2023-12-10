@@ -7,11 +7,28 @@ import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import GHC.Arr as Arr
 
-newtype Tile = Tile {unTile :: Char}
+data Tile
+  = S
+  | NS
+  | WE
+  | NE
+  | NW
+  | SW
+  | SE
+  | G
   deriving (Eq, Ord, Enum)
 
 instance Show Tile where
-  show = show . unTile
+  show p =
+    show $ case p of
+      S -> 'S'
+      NS -> '|'
+      WE -> '-'
+      NE -> 'L'
+      NW -> 'J'
+      SW -> '7'
+      SE -> 'F'
+      G -> '.'
 
 data Direction = North | West | South | East
   deriving (Show, Eq, Ord, Bounded, Enum)
@@ -28,7 +45,15 @@ allDirections :: [Direction]
 allDirections = [minBound .. maxBound]
 
 parseTile :: Char -> Tile
-parseTile = Tile
+parseTile c = case c of
+  'S' -> S
+  '|' -> NS
+  '-' -> WE
+  'L' -> NE
+  'J' -> NW
+  '7' -> SW
+  'F' -> SE
+  _ -> G
 
 parsePipeMap :: T.Text -> PipeMap
 parsePipeMap text =
@@ -41,10 +66,11 @@ parsePipeMap text =
 findStart :: PipeMap -> Maybe Point
 findStart pm =
   let inds = Arr.indices pm
-   in find (\i -> unTile (pm ! i) == 'S') inds
+   in find (\i -> (pm ! i) == S) inds
 
 isPipe :: Tile -> Bool
-isPipe = (`elem` ("S|-LJ7F" :: [Char])) . unTile
+isPipe G = False
+isPipe _ = True
 
 inBounds :: Point -> PipeMap -> Bool
 inBounds p pm = Arr.inRange (Arr.bounds pm) p
@@ -58,15 +84,15 @@ stepDirection (x, y) d =
     East -> (x + 1, y)
 
 availableDirectionsFor :: Tile -> [Direction]
-availableDirectionsFor (Tile c) =
+availableDirectionsFor c =
   case c of
-    'S' -> allDirections
-    '|' -> [North, South]
-    '-' -> [West, East]
-    'L' -> [North, East]
-    'J' -> [North, West]
-    '7' -> [South, West]
-    'F' -> [South, East]
+    S -> allDirections
+    NS -> [North, South]
+    WE -> [West, East]
+    NE -> [North, East]
+    NW -> [North, West]
+    SW -> [South, West]
+    SE -> [South, East]
     _ -> []
 
 findAvailableSteps :: PipeMap -> Point -> [Point]
