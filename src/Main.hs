@@ -9,6 +9,7 @@ import qualified Day.One
 import qualified Day.Seven
 import qualified Day.Six
 import qualified Day.Ten
+import qualified Day.Thirteen
 import qualified Day.Three
 import qualified Day.Twelve
 import qualified Day.Two
@@ -42,4 +43,6 @@ main = do
     "11.2" -> Day.Eleven.solution2 inputFile
     "12.1" -> Day.Twelve.solution1 inputFile
     "12.2" -> Day.Twelve.solution2 inputFile
+    "13.1" -> Day.Thirteen.solution1 inputFile
+    "13.2" -> Day.Thirteen.solution2 inputFile
     _ -> print $ "no solution with index " <> show day
