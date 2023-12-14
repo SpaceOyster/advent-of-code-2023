@@ -22,7 +22,7 @@ correctly. These are inputs I got.
 - [X] Day Eleven
 - [ ] Day Twelve
 - [X] Day Thirteen
-- [ ] Day Fourteen
+- [X] Day Fourteen
 - [ ] Day Fivteen
 - [ ] Day Sixteen
 - [ ] Day Seventeen
