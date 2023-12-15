@@ -27,6 +27,7 @@ library
   exposed-modules:
       Day.Eight
       Day.Eleven
+      Day.Fifteen
       Day.Five
       Day.Four
       Day.Fourteen
@@ -60,6 +61,7 @@ executable advent-of-code-exe
   other-modules:
       Day.Eight
       Day.Eleven
+      Day.Fifteen
       Day.Five
       Day.Four
       Day.Fourteen
